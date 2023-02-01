@@ -20,16 +20,24 @@
 (defvar markdown-regex-header-atx-asynmetric "^#+[ \t]+")
 
 (defun markdown-beginning-of-line (&optional n)
-  (interactive "P") ;; org-beginning-of-line と合わせた
+  ;; mwim の mwim-beginning-of-code-or-line と引数の処理を合わせた
+  (interactive
+   (progn
+     (handle-shift-selection)
+     (when current-prefix-arg
+       (list
+        (prefix-numeric-value current-prefix-arg)))))
 
+  ;; 前置引数がある場合は先に移動する
+  (when (and (not (null n)) (/= n 0)) (forward-line n))
   (cond
-   ((markdown-list-item-at-point-p)(markdown-beginning-of-line--list n))
-   ((markdown-on-heading-p)(markdown-beginning-of-line--heading n))
-   (t (mwim-beginning-of-code-or-line (if n (prefix-numeric-value n) n)))))
+   ((markdown-list-item-at-point-p)(markdown-beginning-of-line--list))
+   ((markdown-on-heading-p)(markdown-beginning-of-line--heading))
+   (t (mwim-beginning-of-code-or-line))))
 
 ;; コードの良し悪しの判断ができない。mwimの内部構造を理解すると、もっと簡易な記述ができるのかもしれない
 ;; [nits] 行頭からコード行頭の間の空白文字の領域で関数を呼び出しした場合に、行頭ではなく、コード行頭にカーソルが移動してしまう挙動がやや気になる。
-(defun markdown-beginning-of-line--list (&optional n)
+(defun markdown-beginning-of-line--list ()
   (cond
    ;; 1. リスト本文の先頭の場合は、bulletの前に移動
    ((looking-back markdown-regex-list)
@@ -44,12 +52,12 @@
         (beginning-of-line)
         (re-search-forward markdown-regex-list)))))
 
-(defun markdown-beginning-of-line--heading (&optional n)
+(defun markdown-beginning-of-line--heading ()
   (cond
    ;; 1. 見出し本文の先頭の場合は、行頭に移動
    ;; 見出しの記号がinvisibleになっている可能性があるので markdown-move-heading-common を使って移動する
    ((looking-back markdown-regex-header-atx-asynmetric)
-    (markdown-move-heading-common #'beginning-of-line n 'adjust))
+    (markdown-move-heading-common #'beginning-of-line nil 'adjust))
    ;; 2. それ以外の場合は、リスト本文の先頭に移動
    (t (progn
         (beginning-of-line)

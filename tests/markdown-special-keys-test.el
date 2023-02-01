@@ -55,6 +55,11 @@ end
     (should (= (point) 13))
     ))
 
+(ert-deftest markdown-test-beginning-of-line/list/prefix ()
+  (mwim-test-with-sample markdown-test-list-sample
+    (markdown-beginning-of-line 4)
+    (should (= (point) 45))))
+
 (ert-deftest markdown-test-beginning-of-line/heading ()
   (mwim-test-with-sample markdown-test-heading-sample
     (markdown-beginning-of-line)
@@ -69,6 +74,11 @@ end
     (markdown-beginning-of-line)
     (should (= (point) 15))
     ))
+
+(ert-deftest markdown-test-beginning-of-line/heading/prefix ()
+  (mwim-test-with-sample markdown-test-heading-sample
+    (markdown-beginning-of-line 4)
+    (should (= (point) 39))))
 
 (ert-deftest markdown-test-beginning-of-line/code ()
   (mwim-test-with-sample markdown-test-code-sample
