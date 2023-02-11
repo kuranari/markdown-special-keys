@@ -160,3 +160,15 @@ end
     (forward-char 4)
     (markdown-backspace-context)
     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
+
+(ert-deftest markdown-test-evil-markdown-insert-line/list ()
+  (mwim-test-with-sample
+   markdown-test-list-sample
+   (evil-markdown-insert-line 1)
+   (should (= (point) 3))))
+
+(ert-deftest markdown-test-evil-markdown-insert-line/heading ()
+  (mwim-test-with-sample
+      markdown-test-heading-sample
+    (evil-markdown-insert-line 1)
+    (should (= (point) 3))))

@@ -105,10 +105,25 @@
    ;; 3. それ以外ならデフォルトの挙動を行う
    (t (markdown-outdent-or-delete 1))))
 
+
+;; 参考: evil-org-insert-line
+(defun evil-markdown-insert-line (count)
+  "Insert at beginning of line.
+The insertion will be repeated COUNT times."
+  (interactive "p")
+  (if (or (markdown-list-item-at-point-p) (markdown-on-heading-p))
+      (progn (beginning-of-line)
+             (markdown-beginning-of-line nil)
+             (evil-insert count))
+    (evil-insert-line count)))
+
 (evil-define-key 'hybrid markdown-mode-map
   (kbd "SPC") 'markdown-insert-space-context
   (kbd "DEL") 'markdown-backspace-context
   (kbd "C-h") 'markdown-backspace-context)
+
+(evil-define-key 'normal markdown-mode-map
+  (kbd "I") 'evil-markdown-insert-line)
 
 (provide 'markdown-special-keys)
 ;;; markdown-special-keys.el ends here
