@@ -105,9 +105,10 @@
    ;; 3. それ以外ならデフォルトの挙動を行う
    (t (markdown-outdent-or-delete 1))))
 
-(evil-define-key 'hybrid markdown-mode-map (kbd "SPC") 'markdown-insert-space-context)
-(evil-define-key 'hybrid markdown-mode-map (kbd "DEL") 'markdown-backspace-context)
-(evil-define-key 'hybrid markdown-mode-map (kbd "C-h") 'markdown-backspace-context)
+(evil-define-key 'hybrid markdown-mode-map
+  (kbd "SPC") 'markdown-insert-space-context
+  (kbd "DEL") 'markdown-backspace-context
+  (kbd "C-h") 'markdown-backspace-context)
 
 (provide 'markdown-special-keys)
 ;;; markdown-special-keys.el ends here
