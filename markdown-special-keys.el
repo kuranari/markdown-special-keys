@@ -82,5 +82,32 @@
 
 (add-hook 'evil-normal-state-entry-hook 'markdown-adjust-hidden-markup)
 
+(defun markdown-insert-space-context ()
+  "カーソルが list の先頭にある場合にインデントする"
+  (interactive)
+  (cond
+   ;; 1. 行頭ならリストを挿入する
+   ((and (bolp) (not (markdown-code-block-at-point-p))) (insert "* "))
+   ;; 2. リストの先頭ならインデントする
+   ((looking-back markdown-regex-list) (markdown-demote-list-item))
+   ;; 3. それ以外ならスペースを入力する
+   (t (insert " "))
+   ))
+
+(defun markdown-backspace-context ()
+  "カーソルが list の先頭にある場合にアウトデントする"
+  (interactive)
+  (cond
+   ;; 1. トップレベルのリストの先頭なら、バレットを削除する
+   ((looking-back "^[-*:+][[:blank:]]+") (kill-line 0))
+   ;; 2. リストの先頭ならアウトデントする
+   ((looking-back markdown-regex-list) (markdown-promote-list-item))
+   ;; 3. それ以外ならデフォルトの挙動を行う
+   (t (markdown-outdent-or-delete 1))))
+
+(evil-define-key 'hybrid markdown-mode-map (kbd "SPC") 'markdown-insert-space-context)
+(evil-define-key 'hybrid markdown-mode-map (kbd "DEL") 'markdown-backspace-context)
+(evil-define-key 'hybrid markdown-mode-map (kbd "C-h") 'markdown-backspace-context)
+
 (provide 'markdown-special-keys)
 ;;; markdown-special-keys.el ends here

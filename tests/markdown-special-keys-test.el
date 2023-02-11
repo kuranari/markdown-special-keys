@@ -1,6 +1,8 @@
 (require 'ert)
 (require 'markdown-special-keys)
 
+(defvar markdown-test-blank-buffer-sample "")
+
 (defvar markdown-test-list-sample "\
 * List1
   * List1-1
@@ -35,6 +37,7 @@ end
   `(with-temp-buffer
      (insert ,sample)
      (markdown-mode)
+     (setq markdown-hide-markup nil)
      (goto-char (point-min))
      ,@body))
 
@@ -96,3 +99,64 @@ end
     (markdown-beginning-of-line 4)
     (should (= (point) 57))
     ))
+
+(ert-deftest markdown-test-insert-space-context/blank-line ()
+  (mwim-test-with-sample
+      ""
+   (markdown-insert-space-context)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* "))))
+
+(ert-deftest markdown-test-insert-space-context/text ()
+  (mwim-test-with-sample
+      "List1"
+    (markdown-insert-space-context)
+    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
+
+(ert-deftest markdown-test-insert-space-context/list-level1 ()
+  (mwim-test-with-sample
+      "* List1"
+    (forward-char 2)
+    (markdown-insert-space-context)
+    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "  * List1"))))
+
+(ert-deftest markdown-test-insert-space-context/list-level1-body ()
+  (mwim-test-with-sample
+      "* List1"
+    (forward-char 3)
+    (markdown-insert-space-context)
+    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* L ist1"))))
+
+(ert-deftest markdown-test-insert-space-context/code-block ()
+  (mwim-test-with-sample "```\n\n```"
+    (next-line)
+    (markdown-insert-space-context)
+    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "```\n \n```"))))
+
+
+(ert-deftest markdown-test-backspace-context/list-level1 ()
+  (mwim-test-with-sample
+      "* List1"
+    (forward-char 2)
+    (markdown-backspace-context)
+    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "List1"))))
+
+(ert-deftest markdown-test-backspace-context/list-level1-body ()
+  (mwim-test-with-sample
+      "* List1"
+    (forward-char 3)
+    (markdown-backspace-context)
+    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* ist1"))))
+
+(ert-deftest markdown-test-backspace-context/list-level2-head-of-bullet ()
+  (mwim-test-with-sample
+      "  * List1"
+    (forward-char 2)
+    (markdown-backspace-context)
+    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
+
+(ert-deftest markdown-test-backspace-context/list-level2-head-of-list ()
+  (mwim-test-with-sample
+      "  * List1"
+    (forward-char 4)
+    (markdown-backspace-context)
+    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
