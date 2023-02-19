@@ -6,7 +6,7 @@
 ;; Version: 0.0.1
 ;; Package-Requires: ((markdown-mode "2.1") (evil "1.5") (mwim "0.4"))
 ;; Keywords: markdown
-;; URL: TODO
+;; URL: https://github.com/kuranari/markdown-special-keys
 
 ;;; Commentary:
 
