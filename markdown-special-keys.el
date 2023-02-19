@@ -15,7 +15,7 @@
 
 ;;; Code:
 (require 'markdown-mode)
-(require 'evil-core)
+(require 'evil)
 
 (defvar markdown-regex-header-atx-asynmetric "^#+[ \t]+")
 
