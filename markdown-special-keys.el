@@ -82,29 +82,41 @@
 
 (add-hook 'evil-normal-state-entry-hook 'markdown-adjust-hidden-markup)
 
+(defun markdown--current-indentation ()
+  (save-excursion
+    (back-to-indentation)
+    (current-column)))
+
 (defun markdown-insert-space-context ()
-  "カーソルが list の先頭にある場合にインデントする"
+  "カーソルがリストの先頭にある場合にインデントする"
   (interactive)
-  (cond
-   ;; 1. 行頭ならリストを挿入する
-   ((and (bolp) (not (markdown-code-block-at-point-p))) (insert "* "))
-   ;; 2. リストの先頭ならインデントする
-   ((looking-back markdown-regex-list) (markdown-demote-list-item))
-   ;; 3. それ以外ならスペースを入力する
-   (t (insert " "))
-   ))
+  (if (markdown-code-block-at-point-p) (insert " ")
+    (let ((start-of-indention (markdown--current-indentation)))
+      (cond
+       ;; 1. 行頭ならリストを挿入する
+       ((bolp) (insert "* "))
+       ;; 2. リストの先頭ならインデントする
+       ((looking-back markdown-regex-list)
+        (save-excursion
+          (indent-line-to (+ start-of-indention markdown-list-indent-width))))
+       ;; 3. それ以外ならスペースを入力する
+       (t (insert " "))))))
 
 (defun markdown-backspace-context ()
-  "カーソルが list の先頭にある場合にアウトデントする"
+  "カーソルがリストの先頭にある場合にアウトデントする"
   (interactive)
-  (cond
-   ;; 1. トップレベルのリストの先頭なら、バレットを削除する
-   ((looking-back "^[-*:+][[:blank:]]+") (kill-line 0))
-   ;; 2. リストの先頭ならアウトデントする
-   ((looking-back markdown-regex-list) (markdown-promote-list-item))
-   ;; 3. それ以外ならデフォルトの挙動を行う
-   (t (markdown-outdent-or-delete 1))))
-
+  (let ((start-of-indention (markdown--current-indentation)))
+    (cond
+     ;; 1. リストの先頭の場合
+     ((looking-back markdown-regex-list)
+      (if (= start-of-indention 0)
+          ;; 1-1. バレットを削除
+          (kill-line 0)
+        ;; 1-2. アウトデント
+        (save-excursion
+          (indent-line-to (- start-of-indention markdown-list-indent-width)))))
+     ;; 2. それ以外ならデフォルトの挙動を行う
+     (t (markdown-outdent-or-delete 1)))))
 
 ;; 参考: evil-org-insert-line
 (defun evil-markdown-insert-line (count)

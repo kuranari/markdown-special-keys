@@ -37,6 +37,7 @@ end
   `(with-temp-buffer
      (insert ,sample)
      (markdown-mode)
+     (setq markdown-list-indent-width 2)
      (setq markdown-hide-markup nil)
      (goto-char (point-min))
      ,@body))
@@ -119,6 +120,14 @@ end
     (markdown-insert-space-context)
     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "  * List1"))))
 
+(ert-deftest markdown-test-insert-space-context/list-level1-2 ()
+  (mwim-test-with-sample "\
+* List1
+  * List1-2"
+   (forward-char 2)
+   (markdown-insert-space-context)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "  * List1\n  * List1-2"))))
+
 (ert-deftest markdown-test-insert-space-context/list-level1-body ()
   (mwim-test-with-sample
       "* List1"
@@ -160,6 +169,14 @@ end
     (forward-char 4)
     (markdown-backspace-context)
     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
+
+(ert-deftest markdown-test-backspace-context/list-level2-3-head-of-list ()
+  (mwim-test-with-sample "\
+  * List1
+    * List1-2"
+   (forward-char 4)
+   (markdown-backspace-context)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1\n    * List1-2"))))
 
 (ert-deftest markdown-test-evil-markdown-insert-line/list ()
   (mwim-test-with-sample
