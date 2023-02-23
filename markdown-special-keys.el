@@ -50,7 +50,7 @@
    ;; 3. それ以外の場合は、リスト本文の先頭に移動
    (t (progn
         (beginning-of-line)
-        (re-search-forward markdown-regex-list)))))
+        (re-search-forward markdown-regex-list nil t)))))
 
 (defun markdown-beginning-of-line--heading ()
   (cond
