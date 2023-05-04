@@ -18,6 +18,9 @@
 (require 'evil)
 
 (defvar markdown-regex-header-atx-asynmetric "^#+[ \t]+")
+;; 全角スペースを空白として扱わないようにするためにmarkdown-modeのmarkdown-regex-listの[[:blank]]を\sで置換
+(defvar markdown-regex-list-ascii-only
+  "^\\(\s*\\)\\([#0-9]+\\.\\|[*+:-]\\)\\(\s+\\)\\(\\(?:\\[[ Xx]]\\)\s*\\)?")
 
 (defun markdown-beginning-of-line (&optional n)
   ;; mwim の mwim-beginning-of-code-or-line と引数の処理を合わせた
@@ -38,7 +41,7 @@
 (defun markdown-beginning-of-line--list ()
   (cond
    ;; 1. リスト本文の先頭の場合は、bulletの前に移動
-   ((looking-back markdown-regex-list)
+   ((looking-back markdown-regex-list-ascii-only)
     ;; 参考: mwim-beginning-of-code
     (progn
       (beginning-of-line)
@@ -48,7 +51,7 @@
    ;; 3. それ以外の場合は、リスト本文の先頭に移動
    (t (progn
         (beginning-of-line)
-        (re-search-forward markdown-regex-list nil t)))))
+        (re-search-forward markdown-regex-list-ascii-only nil t)))))
 
 (defun markdown-beginning-of-line--heading ()
   (cond
@@ -93,7 +96,7 @@
        ;; 1. 行頭ならリストを挿入する
        ((bolp) (insert "* "))
        ;; 2. リストの先頭ならインデントする
-       ((looking-back markdown-regex-list)
+       ((looking-back markdown-regex-list-ascii-only)
         (save-excursion
           (indent-line-to (+ start-of-indention markdown-list-indent-width))))
        ;; 3. それ以外ならスペースを入力する
@@ -105,7 +108,7 @@
   (let ((start-of-indention (markdown--current-indentation)))
     (cond
      ;; 1. リストの先頭の場合
-     ((looking-back markdown-regex-list)
+     ((looking-back markdown-regex-list-ascii-only)
       (if (= start-of-indention 0)
           ;; 1-1. バレットを削除
           (kill-line 0)
