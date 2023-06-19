@@ -178,6 +178,13 @@ end
    (markdown-backspace-context)
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1\n    * List1-2"))))
 
+(ert-deftest markdown-test-backspace-context/full-width-space ()
+  (mwim-test-with-sample
+   "　"
+   (forward-char 1)
+   (markdown-backspace-context)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) ""))))
+
 (ert-deftest markdown-test-evil-markdown-insert-line/list ()
   (mwim-test-with-sample
    markdown-test-list-sample

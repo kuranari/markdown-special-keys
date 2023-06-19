@@ -4,7 +4,7 @@
 
 ;; Author: Tomohisa Kuranari <tomohisa.kuranari@gmail.com>
 ;; Version: 0.0.1
-;; Package-Requires: ((markdown-mode "2.1") (evil "1.5") (mwim "0.4"))
+;; Package-Requires: ((markdown-mode "2.1") (evil "1.15") (mwim "0.4"))
 ;; Keywords: markdown
 ;; URL: https://github.com/kuranari/markdown-special-keys
 
@@ -16,6 +16,7 @@
 ;;; Code:
 (require 'markdown-mode)
 (require 'evil)
+(require 'mwim)
 
 (defvar markdown-regex-header-atx-asynmetric "^#+[ \t]+")
 ;; 全角スペースを空白として扱わないようにするためにmarkdown-modeのmarkdown-regex-listの[[:blank]]を\sで置換
@@ -115,7 +116,10 @@
         ;; 1-2. アウトデント
         (save-excursion
           (indent-line-to (- start-of-indention markdown-list-indent-width)))))
-     ;; 2. それ以外ならデフォルトの挙動を行う
+     ;; 2. 全角スペースの場合は文字する
+     ;; (行頭の全角スペースを削除できるようにするため)
+     ((string= (char-to-string (preceding-char)) "　") (delete-char -1))
+     ;; 3. それ以外ならデフォルトの挙動を行う
      (t (markdown-outdent-or-delete 1)))))
 
 ;; 参考: evil-org-insert-line
