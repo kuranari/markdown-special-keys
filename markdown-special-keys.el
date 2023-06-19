@@ -4,7 +4,7 @@
 
 ;; Author: Tomohisa Kuranari <tomohisa.kuranari@gmail.com>
 ;; Version: 0.0.1
-;; Package-Requires: ((markdown-mode "2.1") (evil "1.5") (mwim "0.4"))
+;; Package-Requires: ((markdown-mode "2.1") (evil "1.15") (mwim "0.4"))
 ;; Keywords: markdown
 ;; URL: https://github.com/kuranari/markdown-special-keys
 
