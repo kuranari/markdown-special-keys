@@ -4,7 +4,7 @@
 
 ;; Author: Tomohisa Kuranari <tomohisa.kuranari@gmail.com>
 ;; Version: 0.0.1
-;; Package-Requires: ((markdown-mode "2.1") (evil "1.15") (mwim "0.4"))
+;; Package-Requires: ((markdown-mode "2.1") (evil "1.15"))
 ;; Keywords: markdown
 ;; URL: https://github.com/kuranari/markdown-special-keys
 
@@ -16,12 +16,15 @@
 ;;; Code:
 (require 'markdown-mode)
 (require 'evil)
-(require 'mwim)
 
 (defvar markdown-regex-header-atx-asynmetric "^#+[ \t]+")
 ;; 全角スペースを空白として扱わないようにするためにmarkdown-modeのmarkdown-regex-listの[[:blank]]を\sで置換
 (defvar markdown-regex-list-ascii-only
   "^\\(\s*\\)\\([#0-9]+\\.\\|[*+:-]\\)\\(\s+\\)\\(\\(?:\\[[ Xx]]\\)\s*\\)?")
+
+(defun markdown-beginning-of-code-or-line ()
+  "Move cursor to beginning of code (first non-whitespace character) or line."
+  (if (bolp) (back-to-indentation) (beginning-of-line)))
 
 (defun markdown-beginning-of-line (&optional n)
   ;; mwim の mwim-beginning-of-code-or-line と引数の処理を合わせた
@@ -37,7 +40,7 @@
   (cond
    ((markdown-list-item-at-point-p)(markdown-beginning-of-line--list))
    ((markdown-on-heading-p)(markdown-beginning-of-line--heading))
-   (t (mwim-beginning-of-code-or-line))))
+   (t (markdown-beginning-of-code-or-line))))
 
 (defun markdown-beginning-of-line--list ()
   (cond
@@ -65,10 +68,6 @@
         (beginning-of-line)
         (re-search-forward markdown-regex-header-atx-asynmetric)))))
 
-;; 本当は 下記のような設定を加えて mwim のオプションに追加したい
-;; (add-to-list 'mwim-beginning-of-line-function '(markdown-mode . markdown-beginning-of-line))
-;; しかし list 以外の要素で Ctrl-a が使えなくなってしまう問題が残るので諦めた(調査時間の問題)
-(evil-define-key 'hybrid markdown-mode-map (kbd "C-a") 'markdown-beginning-of-line)
 
 ;; カーソルが非表示の文字列の上にある場合には、1文字前進させる。
 ;; evil-modeでinsert-modeからnormal-modeに戻る時に、カーソルが一文字後退する(normal-modeでiを押下し、直後にEscを押下するとその挙動がわかる)
@@ -136,6 +135,7 @@ The insertion will be repeated COUNT times."
 (evil-define-key 'hybrid markdown-mode-map
   (kbd "SPC") 'markdown-insert-space-context
   (kbd "DEL") 'markdown-backspace-context
+  (kbd "C-a") 'markdown-beginning-of-line
   (kbd "C-h") 'markdown-backspace-context)
 
 (evil-define-key 'normal markdown-mode-map
