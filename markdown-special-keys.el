@@ -68,7 +68,6 @@
         (beginning-of-line)
         (re-search-forward markdown-regex-header-atx-asynmetric)))))
 
-(evil-define-key 'hybrid markdown-mode-map (kbd "C-a") 'markdown-beginning-of-line)
 
 ;; カーソルが非表示の文字列の上にある場合には、1文字前進させる。
 ;; evil-modeでinsert-modeからnormal-modeに戻る時に、カーソルが一文字後退する(normal-modeでiを押下し、直後にEscを押下するとその挙動がわかる)
@@ -136,6 +135,7 @@ The insertion will be repeated COUNT times."
 (evil-define-key 'hybrid markdown-mode-map
   (kbd "SPC") 'markdown-insert-space-context
   (kbd "DEL") 'markdown-backspace-context
+  (kbd "C-a") 'markdown-beginning-of-line
   (kbd "C-h") 'markdown-backspace-context)
 
 (evil-define-key 'normal markdown-mode-map
