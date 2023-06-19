@@ -16,6 +16,7 @@
 ;;; Code:
 (require 'markdown-mode)
 (require 'evil)
+(require 'mwim)
 
 (defvar markdown-regex-header-atx-asynmetric "^#+[ \t]+")
 ;; 全角スペースを空白として扱わないようにするためにmarkdown-modeのmarkdown-regex-listの[[:blank]]を\sで置換
