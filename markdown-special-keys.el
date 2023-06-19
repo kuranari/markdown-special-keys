@@ -115,7 +115,10 @@
         ;; 1-2. アウトデント
         (save-excursion
           (indent-line-to (- start-of-indention markdown-list-indent-width)))))
-     ;; 2. それ以外ならデフォルトの挙動を行う
+     ;; 2. 全角スペースの場合は文字する
+     ;; (行頭の全角スペースを削除できるようにするため)
+     ((string= (char-to-string (preceding-char)) "　") (delete-char -1))
+     ;; 3. それ以外ならデフォルトの挙動を行う
      (t (markdown-outdent-or-delete 1)))))
 
 ;; 参考: evil-org-insert-line
