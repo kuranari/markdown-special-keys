@@ -18,9 +18,13 @@
 (require 'evil)
 
 (defvar markdown-regex-header-atx-asynmetric "^#+[ \t]+")
-;; 全角スペースを空白として扱わないようにするためにmarkdown-modeのmarkdown-regex-listの[[:blank]]を\sで置換
+
+;; markdown-modeのmarkdown-regex-listを改変して定義
+;; * 全角スペースを空白として扱わないようにするために[[:blank]]を\sで置換
+;; * リスト記号の後ろの空白は1つのみを許容する
+;; * チェックボックスの後ろには1つ以上の空白を必要とする
 (defvar markdown-regex-list-ascii-only
-  "^\\(\s*\\)\\([#0-9]+\\.\\|[*+:-]\\)\\(\s+\\)\\(\\(?:\\[[ Xx]]\\)\s*\\)?")
+  "^\\(\s*\\)\\([#0-9]+\\.\\|[*+:-]\\)\\(\s\\)\\(\\(?:\\[[ Xx]]\\)\s+\\)?")
 
 (defun markdown-beginning-of-code-or-line ()
   "Move cursor to beginning of code (first non-whitespace character) or line."

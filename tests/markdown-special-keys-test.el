@@ -156,6 +156,13 @@ end
     (markdown-backspace-context)
     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* ist1"))))
 
+(ert-deftest markdown-test-backspace-context/list-level1-body-whitespace ()
+  (mwim-test-with-sample
+   "*  List1"
+   (forward-char 3)
+   (markdown-backspace-context)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
+
 (ert-deftest markdown-test-backspace-context/list-level2-head-of-bullet ()
   (mwim-test-with-sample
       "  * List1"
