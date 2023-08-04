@@ -40,13 +40,25 @@ With argument N not nil or 1, move forward N - 1 lines first."
      ((looking-at markdown-regex-header-atx)
       ;; At a header, special position is before the title.
       (let ((refpos (match-beginning 2)))
-	      (if (or (> origin refpos) (= origin (line-beginning-position)))
+	      (if (or (> origin refpos)
+                (= origin (line-beginning-position))
+                (/= (line-number-at-pos origin) (line-number-at-pos)))
 	          (goto-char refpos))))
      ((looking-at markdown-regex-list)
       ;; At a list item, special position is after the list marker or checkbox.
       (let ((refpos (or (match-end 4) (match-end 3))))
-	      (if (or (> origin refpos) (= origin (line-beginning-position)))
+	      (if (or (> origin refpos)
+                (= origin (line-beginning-position))
+                (/= (line-number-at-pos origin) (line-number-at-pos)))
 	          (goto-char refpos))))
+     ((looking-at "^\s+")
+      ;; At an indented text line, special position is after the indentation.
+      (let ((refpos (match-end 0)))
+	      (if (or (> origin refpos)
+                (= origin (line-beginning-position))
+                (/= (line-number-at-pos origin) (line-number-at-pos)))
+            (goto-char refpos))))
+
      ;; No special case, already at beginning of line.
      (t nil))))
 
