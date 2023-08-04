@@ -10,4 +10,4 @@ cask: $(CASK_DIR)
 
 .PHONY: test
 test: cask
-	cask emacs --batch -L . -L tests -l tests/markdown-special-keys-test.el -f ert-run-tests-batch
+	cask emacs -Q --batch -L . -L tests -l tests/markdown-special-keys-test.el -f ert-run-tests-batch

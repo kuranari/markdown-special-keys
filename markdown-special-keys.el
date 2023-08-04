@@ -17,8 +17,6 @@
 (require 'markdown-mode)
 (require 'evil)
 
-(defvar markdown-regex-header-atx-asynmetric "^#+[ \t]+")
-
 ;; markdown-modeのmarkdown-regex-listを改変して定義
 ;; * 全角スペースを空白として扱わないようにするために[[:blank]]を\sで置換
 ;; * リスト記号の後ろの空白は1つのみを許容する
@@ -26,52 +24,45 @@
 (defvar markdown-regex-list-ascii-only
   "^\\(\s*\\)\\([#0-9]+\\.\\|[*+:-]\\)\\(\s\\)\\(\\(?:\\[[ Xx]]\\)\s+\\)?")
 
-(defun markdown-beginning-of-code-or-line ()
-  "Move cursor to beginning of code (first non-whitespace character) or line."
-  (if (bolp) (back-to-indentation) (beginning-of-line)))
-
 (defun markdown-beginning-of-line (&optional n)
-  ;; mwim の mwim-beginning-of-code-or-line と引数の処理を合わせた
-  (interactive
-   (progn
-     (handle-shift-selection)
-     (when current-prefix-arg
-       (list
-        (prefix-numeric-value current-prefix-arg)))))
+  "Go to the beginning of the current line.
 
-  ;; 前置引数がある場合は先に移動する
-  (when (and (not (null n)) (/= n 0)) (forward-line n))
-  (cond
-   ((markdown-list-item-at-point-p)(markdown-beginning-of-line--list))
-   ((markdown-on-heading-p)(markdown-beginning-of-line--heading))
-   (t (markdown-beginning-of-code-or-line))))
+If this is a header or a list item, on the first attempt move to where the
+text starts, and only move to beginning of line when the cursor is already
+before the start of the text of the line.
 
-(defun markdown-beginning-of-line--list ()
-  (cond
-   ;; 1. リスト本文の先頭の場合は、bulletの前に移動
-   ((looking-back markdown-regex-list-ascii-only)
-    ;; 参考: mwim-beginning-of-code
-    (progn
-      (beginning-of-line)
-      (skip-syntax-forward " " (line-end-position))))
-   ;; 2. bulletの前の場合は、行頭に移動
-   ((looking-back "^\s+") (beginning-of-line))
-   ;; 3. それ以外の場合は、リスト本文の先頭に移動
-   (t (progn
-        (beginning-of-line)
-        (re-search-forward markdown-regex-list-ascii-only nil t)))))
+With argument N not nil or 1, move forward N - 1 lines first."
+  (interactive "^p")
+  (let ((origin (point)))
+    ;; First move to a line.
+    (move-beginning-of-line n)
+    (cond
+     ((looking-at markdown-regex-header-atx)
+      ;; At a header, special position is before the title.
+      (let ((refpos (match-beginning 2)))
+	      (if (or (> origin refpos)
+                (= origin (line-beginning-position))
+                (/= (line-number-at-pos origin) (line-number-at-pos))
+                ;; Prevents the cursor from moving to invisible characters
+                markdown-hide-markup)
+	          (goto-char refpos))))
+     ((looking-at markdown-regex-list)
+      ;; At a list item, special position is after the list marker or checkbox.
+      (let ((refpos (or (match-end 4) (match-end 3))))
+	      (if (or (> origin refpos)
+                (= origin (line-beginning-position))
+                (/= (line-number-at-pos origin) (line-number-at-pos)))
+	          (goto-char refpos))))
+     ((looking-at "^\s+")
+      ;; At an indented text line, special position is after the indentation.
+      (let ((refpos (match-end 0)))
+	      (if (or (> origin refpos)
+                (= origin (line-beginning-position))
+                (/= (line-number-at-pos origin) (line-number-at-pos)))
+            (goto-char refpos))))
 
-(defun markdown-beginning-of-line--heading ()
-  (cond
-   ;; 1. 見出し文字列の先頭の場合は、行頭に移動
-   ;; 見出しの記号がinvisibleになっている可能性があるので markdown-move-heading-common を使って移動する
-   ((looking-back markdown-regex-header-atx-asynmetric)
-    (markdown-move-heading-common #'beginning-of-line nil 'adjust))
-   ;; 2. それ以外の場合は、見出し文字列の先頭に移動
-   (t (progn
-        (beginning-of-line)
-        (re-search-forward markdown-regex-header-atx-asynmetric)))))
-
+     ;; No special case, already at beginning of line.
+     (t nil))))
 
 ;; カーソルが非表示の文字列の上にある場合には、1文字前進させる。
 ;; evil-modeでinsert-modeからnormal-modeに戻る時に、カーソルが一文字後退する(normal-modeでiを押下し、直後にEscを押下するとその挙動がわかる)

@@ -52,8 +52,6 @@ end
     (markdown-beginning-of-line)
     (should (= (point) 13))
     (markdown-beginning-of-line)
-    (should (= (point) 11))
-    (markdown-beginning-of-line)
     (should (= (point) 9))
     (markdown-beginning-of-line)
     (should (= (point) 13))
@@ -61,8 +59,8 @@ end
 
 (ert-deftest markdown-test-beginning-of-line/list/prefix ()
   (mwim-test-with-sample markdown-test-list-sample
-    (markdown-beginning-of-line 4)
-    (should (= (point) 45))))
+    (markdown-beginning-of-line 2)
+    (should (= (point) 13))))
 
 (ert-deftest markdown-test-beginning-of-line/heading ()
   (mwim-test-with-sample markdown-test-heading-sample
@@ -80,9 +78,9 @@ end
     ))
 
 (ert-deftest markdown-test-beginning-of-line/heading/prefix ()
-  (mwim-test-with-sample markdown-test-heading-sample
-    (markdown-beginning-of-line 4)
-    (should (= (point) 39))))
+  (mwim-test-with-sample "# heading1\n## heading2"
+                         (markdown-beginning-of-line 2)
+                         (should (= (point) 15))))
 
 (ert-deftest markdown-test-beginning-of-line/code ()
   (mwim-test-with-sample markdown-test-code-sample
@@ -98,8 +96,7 @@ end
 (ert-deftest markdown-test-beginning-of-line/code/prefix ()
   (mwim-test-with-sample markdown-test-code-sample
     (markdown-beginning-of-line 4)
-    (should (= (point) 57))
-    ))
+    (should (= (point) 36))))
 
 (ert-deftest markdown-test-insert-space-context/blank-line ()
   (mwim-test-with-sample
