@@ -42,7 +42,9 @@ With argument N not nil or 1, move forward N - 1 lines first."
       (let ((refpos (match-beginning 2)))
 	      (if (or (> origin refpos)
                 (= origin (line-beginning-position))
-                (/= (line-number-at-pos origin) (line-number-at-pos)))
+                (/= (line-number-at-pos origin) (line-number-at-pos))
+                ;; Prevents the cursor from moving to invisible characters
+                markdown-hide-markup)
 	          (goto-char refpos))))
      ((looking-at markdown-regex-list)
       ;; At a list item, special position is after the list marker or checkbox.
