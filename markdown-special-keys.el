@@ -89,6 +89,7 @@ With argument N not nil or 1, move forward N - 1 lines first."
     (let ((start-of-indention (markdown--current-indentation)))
       (cond
        ;; 1. 行頭ならリストを挿入する
+       ;; (markdown-insert-list-item)を使うと前の行とインデントレベルが合うが求めている挙動ではない
        ((bolp) (insert "* "))
        ;; 2. リストの先頭ならインデントする
        ((looking-back markdown-regex-list-ascii-only)
@@ -126,6 +127,17 @@ The insertion will be repeated COUNT times."
              (markdown-beginning-of-line nil)
              (evil-insert count))
     (evil-insert-line count)))
+
+(defun markdown-cycle-advice (original &rest args)
+  (if (or (not (bolp))
+          (markdown-code-block-at-point-p)
+          (markdown-list-item-at-point-p)
+          (markdown-table-at-point-p)
+          (markdown-on-heading-p))
+      (apply original args)
+    (insert "* ")))
+
+(advice-add 'markdown-cycle :around #'markdown-cycle-advice)
 
 (evil-define-key 'hybrid markdown-mode-map
   (kbd "SPC") 'markdown-insert-space-context

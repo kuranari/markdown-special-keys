@@ -1,4 +1,5 @@
 (require 'ert)
+(require 'ert-x)
 (require 'markdown-special-keys)
 
 (defvar markdown-test-blank-buffer-sample "")
@@ -197,6 +198,42 @@ end
 
 (ert-deftest markdown-test-evil-markdown-insert-line/heading ()
   (mwim-test-with-sample
-      markdown-test-heading-sample
-    (evil-markdown-insert-line 1)
-    (should (= (point) 3))))
+   markdown-test-heading-sample
+   (evil-markdown-insert-line 1)
+   (should (= (point) 3))))
+
+(ert-deftest markdown-test-markdown-cycle-advice/plain-text ()
+  (mwim-test-with-sample ""
+   (ert-simulate-command '(markdown-cycle))
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* ")))
+
+  (mwim-test-with-sample "body"
+   (ert-simulate-command '(markdown-cycle))
+
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* body")))
+
+  (mwim-test-with-sample "body"
+   (let ((indent-tabs-mode nil))
+     (forward-char 1)
+     ;; markdownで呼び出されるmarkdown-indent-lineがthis-commandに依存しているため
+     ;; ert-x.elのert-simulate-commandを使う
+     (ert-simulate-command '(markdown-cycle))
+     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "    body")))))
+
+(ert-deftest markdown-test-markdown-cycle-advice/heading ()
+  (mwim-test-with-sample "## Heading"
+   (ert-simulate-command '(markdown-cycle))
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "## Heading"))))
+
+(ert-deftest markdown-test-markdown-cycle-advice/list ()
+  (mwim-test-with-sample "* List"
+   (ert-simulate-command '(markdown-cycle))
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "  * List"))))
+
+(ert-deftest markdown-test-markdown-cycle-advice/table ()
+  (mwim-test-with-sample "| aaa | bbb |"
+   (ert-simulate-command '(markdown-cycle))
+   (should (= (point) 3))
+   (ert-simulate-command '(markdown-cycle))
+   (should (= (point) 9))
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "| aaa | bbb |"))))
