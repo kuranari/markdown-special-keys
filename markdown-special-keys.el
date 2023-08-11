@@ -139,6 +139,22 @@ The insertion will be repeated COUNT times."
 
 (advice-add 'markdown-cycle :around #'markdown-cycle-advice)
 
+(defun markdown-enter-key-advice (original &rest args)
+  ;; Listと本文の間に空行がない場合に、本文の次の行がリストになることを防ぐため
+  ;; markdown-indent-on-enterが'indent-and-new-itemであってもList ItemのLazy continuation lineでは新規リストを追加しない
+  (if (and
+       (memq markdown-indent-on-enter '(indent-and-new-item))
+       (markdown-list-item-at-point-p)
+       (save-excursion
+         (beginning-of-line)
+         (not (looking-at-p markdown-regex-list))))
+      (progn
+        (newline)
+        (markdown-indent-line))
+    (apply original args)))
+
+(advice-add 'markdown-enter-key :around #'markdown-enter-key-advice)
+
 (evil-define-key 'hybrid markdown-mode-map
   (kbd "SPC") 'markdown-insert-space-context
   (kbd "DEL") 'markdown-backspace-context
