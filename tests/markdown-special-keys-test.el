@@ -237,3 +237,12 @@ end
    (ert-simulate-command '(markdown-cycle))
    (should (= (point) 9))
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "| aaa | bbb |"))))
+
+(ert-deftest markdown-test-enter-key-advice ()
+  (let ((markdown-indent-on-enter 'indent-and-new-item))
+    (mwim-test-with-sample
+     "* List\nlazy body"
+     (next-line)
+     (end-of-line)
+     (markdown-enter-key)
+     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List\nlazy body\n")))))
