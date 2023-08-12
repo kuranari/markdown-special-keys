@@ -238,7 +238,7 @@ end
    (should (= (point) 9))
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "| aaa | bbb |"))))
 
-(ert-deftest markdown-test-enter-key-advice ()
+(ert-deftest markdown-test-enter-key-advice/list ()
   (let ((markdown-indent-on-enter 'indent-and-new-item))
     (mwim-test-with-sample
      "* List\nlazy body"
@@ -246,3 +246,11 @@ end
      (end-of-line)
      (markdown-enter-key)
      (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List\nlazy body\n")))))
+
+(ert-deftest markdown-test-enter-key-advice/heading ()
+  (mwim-test-with-sample
+   "## Heading"
+   (markdown-toggle-markup-hiding +1)
+   (forward-char 3)
+   (markdown-enter-key)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "\n## Heading"))))
