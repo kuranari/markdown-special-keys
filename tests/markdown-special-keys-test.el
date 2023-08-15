@@ -196,6 +196,7 @@ end
   (markdown-test-buffer
    "* List"
    (ert-simulate-command '(markdown-cycle))
+   ;; TODO expected 4 spaces but actual 2 spaces.
    (should (string= (buffer-string) "  * List"))))
 
 (ert-deftest test/markdown-markdown-cycle-advice/table ()
