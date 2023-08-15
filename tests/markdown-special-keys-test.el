@@ -43,7 +43,7 @@ end
      (goto-char (point-min))
      ,@body))
 
-(ert-deftest markdown-test-beginning-of-line/list ()
+(ert-deftest test/markdown-beginning-of-line/list ()
   (mwim-test-with-sample markdown-test-list-sample
     (markdown-beginning-of-line)
     (should (= (point) 3))
@@ -58,12 +58,12 @@ end
     (should (= (point) 13))
     ))
 
-(ert-deftest markdown-test-beginning-of-line/list/prefix ()
+(ert-deftest test/markdown-beginning-of-line/list/prefix ()
   (mwim-test-with-sample markdown-test-list-sample
     (markdown-beginning-of-line 2)
     (should (= (point) 13))))
 
-(ert-deftest markdown-test-beginning-of-line/heading ()
+(ert-deftest test/markdown-beginning-of-line/heading ()
   (mwim-test-with-sample markdown-test-heading-sample
     (markdown-beginning-of-line)
     (should (= (point) 3))
@@ -78,12 +78,12 @@ end
     (should (= (point) 15))
     ))
 
-(ert-deftest markdown-test-beginning-of-line/heading/prefix ()
+(ert-deftest test/markdown-beginning-of-line/heading/prefix ()
   (mwim-test-with-sample "# heading1\n## heading2"
                          (markdown-beginning-of-line 2)
                          (should (= (point) 15))))
 
-(ert-deftest markdown-test-beginning-of-line/code ()
+(ert-deftest test/markdown-beginning-of-line/code ()
   (mwim-test-with-sample markdown-test-code-sample
     (next-line 2)
     (markdown-beginning-of-line)
@@ -94,31 +94,31 @@ end
     (should (= (point) 22))
     ))
 
-(ert-deftest markdown-test-beginning-of-line/code/prefix ()
+(ert-deftest test/markdown-beginning-of-line/code/prefix ()
   (mwim-test-with-sample markdown-test-code-sample
     (markdown-beginning-of-line 4)
     (should (= (point) 36))))
 
-(ert-deftest markdown-test-insert-space-context/blank-line ()
+(ert-deftest test/markdown-insert-space-context/blank-line ()
   (mwim-test-with-sample
       ""
    (markdown-insert-space-context)
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* "))))
 
-(ert-deftest markdown-test-insert-space-context/text ()
+(ert-deftest test/markdown-insert-space-context/text ()
   (mwim-test-with-sample
       "List1"
     (markdown-insert-space-context)
     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
 
-(ert-deftest markdown-test-insert-space-context/list-level1 ()
+(ert-deftest test/markdown-insert-space-context/list-level1 ()
   (mwim-test-with-sample
       "* List1"
     (forward-char 2)
     (markdown-insert-space-context)
     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "  * List1"))))
 
-(ert-deftest markdown-test-insert-space-context/list-level1-2 ()
+(ert-deftest test/markdown-insert-space-context/list-level1-2 ()
   (mwim-test-with-sample "\
 * List1
   * List1-2"
@@ -126,56 +126,56 @@ end
    (markdown-insert-space-context)
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "  * List1\n  * List1-2"))))
 
-(ert-deftest markdown-test-insert-space-context/list-level1-body ()
+(ert-deftest test/markdown-insert-space-context/list-level1-body ()
   (mwim-test-with-sample
       "* List1"
     (forward-char 3)
     (markdown-insert-space-context)
     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* L ist1"))))
 
-(ert-deftest markdown-test-insert-space-context/code-block ()
+(ert-deftest test/markdown-insert-space-context/code-block ()
   (mwim-test-with-sample "```\n\n```"
     (next-line)
     (markdown-insert-space-context)
     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "```\n \n```"))))
 
 
-(ert-deftest markdown-test-backspace-context/list-level1 ()
+(ert-deftest test/markdown-backspace-context/list-level1 ()
   (mwim-test-with-sample
       "* List1"
     (forward-char 2)
     (markdown-backspace-context)
     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "List1"))))
 
-(ert-deftest markdown-test-backspace-context/list-level1-body ()
+(ert-deftest test/markdown-backspace-context/list-level1-body ()
   (mwim-test-with-sample
       "* List1"
     (forward-char 3)
     (markdown-backspace-context)
     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* ist1"))))
 
-(ert-deftest markdown-test-backspace-context/list-level1-body-whitespace ()
+(ert-deftest test/markdown-backspace-context/list-level1-body-whitespace ()
   (mwim-test-with-sample
    "*  List1"
    (forward-char 3)
    (markdown-backspace-context)
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
 
-(ert-deftest markdown-test-backspace-context/list-level2-head-of-bullet ()
+(ert-deftest test/markdown-backspace-context/list-level2-head-of-bullet ()
   (mwim-test-with-sample
       "  * List1"
     (forward-char 2)
     (markdown-backspace-context)
     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
 
-(ert-deftest markdown-test-backspace-context/list-level2-head-of-list ()
+(ert-deftest test/markdown-backspace-context/list-level2-head-of-list ()
   (mwim-test-with-sample
       "  * List1"
     (forward-char 4)
     (markdown-backspace-context)
     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
 
-(ert-deftest markdown-test-backspace-context/list-level2-3-head-of-list ()
+(ert-deftest test/markdown-backspace-context/list-level2-3-head-of-list ()
   (mwim-test-with-sample "\
   * List1
     * List1-2"
@@ -183,26 +183,26 @@ end
    (markdown-backspace-context)
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1\n    * List1-2"))))
 
-(ert-deftest markdown-test-backspace-context/full-width-space ()
+(ert-deftest test/markdown-backspace-context/full-width-space ()
   (mwim-test-with-sample
    "　"
    (forward-char 1)
    (markdown-backspace-context)
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) ""))))
 
-(ert-deftest markdown-test-evil-markdown-insert-line/list ()
+(ert-deftest test/markdown-evil-markdown-insert-line/list ()
   (mwim-test-with-sample
    markdown-test-list-sample
    (evil-markdown-insert-line 1)
    (should (= (point) 3))))
 
-(ert-deftest markdown-test-evil-markdown-insert-line/heading ()
+(ert-deftest test/markdown-evil-markdown-insert-line/heading ()
   (mwim-test-with-sample
    markdown-test-heading-sample
    (evil-markdown-insert-line 1)
    (should (= (point) 3))))
 
-(ert-deftest markdown-test-markdown-cycle-advice/plain-text ()
+(ert-deftest test/markdown-markdown-cycle-advice/plain-text ()
   (mwim-test-with-sample ""
    (ert-simulate-command '(markdown-cycle))
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* ")))
@@ -220,17 +220,17 @@ end
      (ert-simulate-command '(markdown-cycle))
      (should (equal (buffer-substring-no-properties (point-min) (point-max)) "    body")))))
 
-(ert-deftest markdown-test-markdown-cycle-advice/heading ()
+(ert-deftest test/markdown-markdown-cycle-advice/heading ()
   (mwim-test-with-sample "## Heading"
    (ert-simulate-command '(markdown-cycle))
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "## Heading"))))
 
-(ert-deftest markdown-test-markdown-cycle-advice/list ()
+(ert-deftest test/markdown-markdown-cycle-advice/list ()
   (mwim-test-with-sample "* List"
    (ert-simulate-command '(markdown-cycle))
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "  * List"))))
 
-(ert-deftest markdown-test-markdown-cycle-advice/table ()
+(ert-deftest test/markdown-markdown-cycle-advice/table ()
   (mwim-test-with-sample "| aaa | bbb |"
    (ert-simulate-command '(markdown-cycle))
    (should (= (point) 3))
@@ -238,7 +238,7 @@ end
    (should (= (point) 9))
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "| aaa | bbb |"))))
 
-(ert-deftest markdown-test-enter-key-advice/list ()
+(ert-deftest test/markdown-enter-key-advice/list ()
   (let ((markdown-indent-on-enter 'indent-and-new-item))
     (mwim-test-with-sample
      "* List\nlazy body"
@@ -247,7 +247,7 @@ end
      (markdown-enter-key)
      (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List\nlazy body\n")))))
 
-(ert-deftest markdown-test-enter-key-advice/heading ()
+(ert-deftest test/markdown-enter-key-advice/heading ()
   (mwim-test-with-sample
    "## Heading"
    (markdown-toggle-markup-hiding +1)
