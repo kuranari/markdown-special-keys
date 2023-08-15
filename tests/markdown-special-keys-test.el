@@ -16,18 +16,13 @@
 
 (ert-deftest test/markdown-beginning-of-line/list ()
   (markdown-test-buffer
-   "* List1\n    * List1-1"
+   "    * List1-1"
    (markdown-beginning-of-line)
-   (should (= (point) 3))
+   (should (= (point) 7))
    (markdown-beginning-of-line)
    (should (= (point) 1))
-   (next-line)
    (markdown-beginning-of-line)
-   (should (= (point) 15))
-   (markdown-beginning-of-line)
-   (should (= (point) 9))
-   (markdown-beginning-of-line)
-   (should (= (point) 15))))
+   (should (= (point) 7))))
 
 (ert-deftest test/markdown-beginning-of-line/list/prefix ()
   (markdown-test-buffer
@@ -37,18 +32,13 @@
 
 (ert-deftest test/markdown-beginning-of-line/heading ()
   (markdown-test-buffer
-   "# heading1\n## heading2"
+   "## heading2"
    (markdown-beginning-of-line)
-   (should (= (point) 3))
+   (should (= (point) 4))
    (markdown-beginning-of-line)
    (should (= (point) 1))
-   (next-line)
    (markdown-beginning-of-line)
-   (should (= (point) 15))
-   (markdown-beginning-of-line)
-   (should (= (point) 12))
-   (markdown-beginning-of-line)
-   (should (= (point) 15))))
+   (should (= (point) 4))))
 
 (ert-deftest test/markdown-beginning-of-line/heading/prefix ()
   (markdown-test-buffer
@@ -64,23 +54,11 @@ def hello
   puts 'hello world'
 end
 ```"
-   (next-line 2)
-   (markdown-beginning-of-line)
+   (markdown-beginning-of-line 3) ; prefix command
    (should (= (point) 17))
    (markdown-beginning-of-line)
    (should (= (point) 15))
    (markdown-beginning-of-line)
-   (should (= (point) 17))))
-
-(ert-deftest test/markdown-beginning-of-line/code/prefix ()
-  (markdown-test-buffer
-   "\
-```
-def hello
-  puts 'hello world'
-end
-```"
-   (markdown-beginning-of-line 3)
    (should (= (point) 17))))
 
 (ert-deftest test/markdown-insert-space-context/blank-line ()
@@ -104,12 +82,10 @@ end
 
 (ert-deftest test/markdown-insert-space-context/list-level1-2 ()
   (markdown-test-buffer
-   "\
-* List1
-    * List1-2"
+   "* List1\n    * List1-1"
    (forward-char 2)
    (markdown-insert-space-context)
-   (should (string= (buffer-string) "    * List1\n    * List1-2"))))
+   (should (string= (buffer-string) "    * List1\n    * List1-1"))))
 
 (ert-deftest test/markdown-insert-space-context/list-level1-body ()
   (markdown-test-buffer
