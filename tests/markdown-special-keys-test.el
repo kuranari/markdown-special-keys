@@ -87,20 +87,20 @@ end
   (markdown-test-buffer
    ""
    (markdown-insert-space-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* "))))
+   (should (string= (buffer-string) "* "))))
 
 (ert-deftest test/markdown-insert-space-context/text ()
   (markdown-test-buffer
    "List1"
    (markdown-insert-space-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
+   (should (string= (buffer-string) "* List1"))))
 
 (ert-deftest test/markdown-insert-space-context/list-level1 ()
   (markdown-test-buffer
    "* List1"
    (forward-char 2)
    (markdown-insert-space-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "    * List1"))))
+   (should (string= (buffer-string) "    * List1"))))
 
 (ert-deftest test/markdown-insert-space-context/list-level1-2 ()
   (markdown-test-buffer
@@ -109,21 +109,21 @@ end
     * List1-2"
    (forward-char 2)
    (markdown-insert-space-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "    * List1\n    * List1-2"))))
+   (should (string= (buffer-string) "    * List1\n    * List1-2"))))
 
 (ert-deftest test/markdown-insert-space-context/list-level1-body ()
   (markdown-test-buffer
    "* List1"
    (forward-char 3)
    (markdown-insert-space-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* L ist1"))))
+   (should (string= (buffer-string) "* L ist1"))))
 
 (ert-deftest test/markdown-insert-space-context/code-block ()
   (markdown-test-buffer
    "```\n\n```"
    (next-line)
    (markdown-insert-space-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "```\n \n```"))))
+   (should (string= (buffer-string) "```\n \n```"))))
 
 
 (ert-deftest test/markdown-backspace-context/list-level1 ()
@@ -131,35 +131,35 @@ end
    "* List1"
    (forward-char 2)
    (markdown-backspace-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "List1"))))
+   (should (string= (buffer-string) "List1"))))
 
 (ert-deftest test/markdown-backspace-context/list-level1-body ()
   (markdown-test-buffer
    "* List1"
    (forward-char 3)
    (markdown-backspace-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* ist1"))))
+   (should (string= (buffer-string) "* ist1"))))
 
 (ert-deftest test/markdown-backspace-context/list-level1-body-whitespace ()
   (markdown-test-buffer
    "*  List1"
    (forward-char 3)
    (markdown-backspace-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
+   (should (string= (buffer-string) "* List1"))))
 
 (ert-deftest test/markdown-backspace-context/list-level2-head-of-bullet ()
   (markdown-test-buffer
    "    * List1"
    (forward-char 4)
    (markdown-backspace-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
+   (should (string= (buffer-string) "* List1"))))
 
 (ert-deftest test/markdown-backspace-context/list-level2-head-of-list ()
   (markdown-test-buffer
    "    * List1"
    (forward-char 6)
    (markdown-backspace-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
+   (should (string= (buffer-string) "* List1"))))
 
 (ert-deftest test/markdown-backspace-context/list-level2-3-head-of-list ()
   (markdown-test-buffer
@@ -168,14 +168,14 @@ end
         * List1-2"
    (forward-char 6)
    (markdown-backspace-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1\n        * List1-2"))))
+   (should (string= (buffer-string) "* List1\n        * List1-2"))))
 
 (ert-deftest test/markdown-backspace-context/full-width-space ()
   (markdown-test-buffer
    "　"
    (forward-char 1)
    (markdown-backspace-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) ""))))
+   (should (string= (buffer-string) ""))))
 
 (ert-deftest test/markdown-evil-markdown-insert-line/list ()
   (markdown-test-buffer
@@ -193,13 +193,13 @@ end
   (markdown-test-buffer
    ""
    (ert-simulate-command '(markdown-cycle))
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* ")))
+   (should (string= (buffer-string) "* ")))
 
   (markdown-test-buffer
    "body"
    (ert-simulate-command '(markdown-cycle))
 
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* body")))
+   (should (string= (buffer-string) "* body")))
 
   (markdown-test-buffer
    "body"
@@ -208,19 +208,19 @@ end
      ;; markdownで呼び出されるmarkdown-indent-lineがthis-commandに依存しているため
      ;; ert-x.elのert-simulate-commandを使う
      (ert-simulate-command '(markdown-cycle))
-     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "    body")))))
+     (should (string= (buffer-string) "    body")))))
 
 (ert-deftest test/markdown-markdown-cycle-advice/heading ()
   (markdown-test-buffer
    "## Heading"
    (ert-simulate-command '(markdown-cycle))
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "## Heading"))))
+   (should (string= (buffer-string) "## Heading"))))
 
 (ert-deftest test/markdown-markdown-cycle-advice/list ()
   (markdown-test-buffer
    "* List"
    (ert-simulate-command '(markdown-cycle))
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "  * List"))))
+   (should (string= (buffer-string) "  * List"))))
 
 (ert-deftest test/markdown-markdown-cycle-advice/table ()
   (markdown-test-buffer
@@ -229,7 +229,7 @@ end
    (should (= (point) 3))
    (ert-simulate-command '(markdown-cycle))
    (should (= (point) 9))
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "| aaa | bbb |"))))
+   (should (string= (buffer-string) "| aaa | bbb |"))))
 
 (ert-deftest test/markdown-enter-key-advice/list ()
   (let ((markdown-indent-on-enter 'indent-and-new-item))
@@ -238,7 +238,7 @@ end
      (next-line)
      (end-of-line)
      (markdown-enter-key)
-     (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List\nlazy body\n")))))
+     (should (string= (buffer-string) "* List\nlazy body\n")))))
 
 (ert-deftest test/markdown-enter-key-advice/heading ()
   (markdown-test-buffer
@@ -246,4 +246,4 @@ end
    (markdown-toggle-markup-hiding +1)
    (forward-char 3)
    (markdown-enter-key)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "\n## Heading"))))
+   (should (string= (buffer-string) "\n## Heading"))))
