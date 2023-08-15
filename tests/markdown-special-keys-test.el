@@ -9,31 +9,30 @@
   `(with-temp-buffer
      (insert ,sample)
      (markdown-mode)
-     (setq markdown-list-indent-width 2)
-     (setq markdown-hide-markup nil)
+     (setq-default indent-tabs-mode nil)
      (goto-char (point-min))
      ,@body))
 
 (ert-deftest test/markdown-beginning-of-line/list ()
   (markdown-test-buffer
-   "* List1\n  * List1-1"
+   "* List1\n    * List1-1"
    (markdown-beginning-of-line)
    (should (= (point) 3))
    (markdown-beginning-of-line)
    (should (= (point) 1))
    (next-line)
    (markdown-beginning-of-line)
-   (should (= (point) 13))
+   (should (= (point) 15))
    (markdown-beginning-of-line)
    (should (= (point) 9))
    (markdown-beginning-of-line)
-   (should (= (point) 13))))
+   (should (= (point) 15))))
 
 (ert-deftest test/markdown-beginning-of-line/list/prefix ()
   (markdown-test-buffer
-   "* List1\n  * List1-1"
+   "* List1\n    * List1-1"
    (markdown-beginning-of-line 2)
-   (should (= (point) 13))))
+   (should (= (point) 15))))
 
 (ert-deftest test/markdown-beginning-of-line/heading ()
   (markdown-test-buffer
@@ -99,15 +98,15 @@ end
       "* List1"
     (forward-char 2)
     (markdown-insert-space-context)
-    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "  * List1"))))
+    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "    * List1"))))
 
 (ert-deftest test/markdown-insert-space-context/list-level1-2 ()
   (markdown-test-buffer "\
 * List1
-  * List1-2"
+    * List1-2"
    (forward-char 2)
    (markdown-insert-space-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "  * List1\n  * List1-2"))))
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "    * List1\n    * List1-2"))))
 
 (ert-deftest test/markdown-insert-space-context/list-level1-body ()
   (markdown-test-buffer
@@ -132,10 +131,10 @@ end
 
 (ert-deftest test/markdown-backspace-context/list-level1-body ()
   (markdown-test-buffer
-      "* List1"
-    (forward-char 3)
-    (markdown-backspace-context)
-    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* ist1"))))
+   "* List1"
+   (forward-char 3)
+   (markdown-backspace-context)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* ist1"))))
 
 (ert-deftest test/markdown-backspace-context/list-level1-body-whitespace ()
   (markdown-test-buffer
@@ -146,25 +145,26 @@ end
 
 (ert-deftest test/markdown-backspace-context/list-level2-head-of-bullet ()
   (markdown-test-buffer
-      "  * List1"
-    (forward-char 2)
-    (markdown-backspace-context)
-    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
+   "    * List1"
+   (forward-char 4)
+   (markdown-backspace-context)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
 
 (ert-deftest test/markdown-backspace-context/list-level2-head-of-list ()
   (markdown-test-buffer
-      "  * List1"
-    (forward-char 4)
-    (markdown-backspace-context)
-    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
+   "    * List1"
+   (forward-char 6)
+   (markdown-backspace-context)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
 
 (ert-deftest test/markdown-backspace-context/list-level2-3-head-of-list ()
-  (markdown-test-buffer "\
-  * List1
-    * List1-2"
-   (forward-char 4)
+  (markdown-test-buffer
+   "\
+    * List1
+        * List1-2"
+   (forward-char 6)
    (markdown-backspace-context)
-   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1\n    * List1-2"))))
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1\n        * List1-2"))))
 
 (ert-deftest test/markdown-backspace-context/full-width-space ()
   (markdown-test-buffer
