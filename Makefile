@@ -10,4 +10,7 @@ cask: $(CASK_DIR)
 
 .PHONY: test
 test: cask
-	cask emacs -Q --batch -L . -L tests -l tests/markdown-special-keys-test.el -f ert-run-tests-batch
+	SELECTOR=$(SELECTOR)
+	cask emacs -Q --batch -L . -L tests \
+		-l tests/markdown-special-keys-test.el \
+		--eval '(ert-run-tests-batch-and-exit $(SELECTOR))'
