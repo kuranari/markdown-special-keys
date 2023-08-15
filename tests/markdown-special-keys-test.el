@@ -2,34 +2,6 @@
 (require 'ert-x)
 (require 'markdown-special-keys)
 
-(defvar markdown-test-blank-buffer-sample "")
-
-(defvar markdown-test-list-sample "\
-* List1
-  * List1-1
-* List2
-  * List2-1
-  * List2-2
-* List3")
-
-(defvar markdown-test-heading-sample "\
-# Heading1
-## Heading1-1
-textbody
-
-## Heading1-2
-textbody")
-
-(defvar markdown-test-code-sample "\
-```
-class Greeting
-  def hello
-    puts 'hello world'
-  end
-end
-```
-")
-
 ;; mwim のテストケースを参考にmacroを作成
 ;; markdown-beginning-of-line の内部処理では、テキストプロパティを使った判定を行なっている箇所があるため insert 後に markdown-mode を有効にしている。
 ;; 逆順にすると、正しくテストができないため注意
@@ -44,39 +16,40 @@ end
      ,@body))
 
 (ert-deftest test/markdown-beginning-of-line/list ()
-  (mwim-test-with-sample markdown-test-list-sample
-    (markdown-beginning-of-line)
-    (should (= (point) 3))
-    (markdown-beginning-of-line)
-    (should (= (point) 1))
-    (next-line)
-    (markdown-beginning-of-line)
-    (should (= (point) 13))
-    (markdown-beginning-of-line)
-    (should (= (point) 9))
-    (markdown-beginning-of-line)
-    (should (= (point) 13))
-    ))
+  (mwim-test-with-sample
+   "* List1\n  * List1-1"
+   (markdown-beginning-of-line)
+   (should (= (point) 3))
+   (markdown-beginning-of-line)
+   (should (= (point) 1))
+   (next-line)
+   (markdown-beginning-of-line)
+   (should (= (point) 13))
+   (markdown-beginning-of-line)
+   (should (= (point) 9))
+   (markdown-beginning-of-line)
+   (should (= (point) 13))))
 
 (ert-deftest test/markdown-beginning-of-line/list/prefix ()
-  (mwim-test-with-sample markdown-test-list-sample
-    (markdown-beginning-of-line 2)
-    (should (= (point) 13))))
+  (mwim-test-with-sample
+   "* List1\n  * List1-1"
+   (markdown-beginning-of-line 2)
+   (should (= (point) 13))))
 
 (ert-deftest test/markdown-beginning-of-line/heading ()
-  (mwim-test-with-sample markdown-test-heading-sample
-    (markdown-beginning-of-line)
-    (should (= (point) 3))
-    (markdown-beginning-of-line)
-    (should (= (point) 1))
-    (next-line)
-    (markdown-beginning-of-line)
-    (should (= (point) 15))
-    (markdown-beginning-of-line)
-    (should (= (point) 12))
-    (markdown-beginning-of-line)
-    (should (= (point) 15))
-    ))
+  (mwim-test-with-sample
+   "# heading1\n## heading2"
+   (markdown-beginning-of-line)
+   (should (= (point) 3))
+   (markdown-beginning-of-line)
+   (should (= (point) 1))
+   (next-line)
+   (markdown-beginning-of-line)
+   (should (= (point) 15))
+   (markdown-beginning-of-line)
+   (should (= (point) 12))
+   (markdown-beginning-of-line)
+   (should (= (point) 15))))
 
 (ert-deftest test/markdown-beginning-of-line/heading/prefix ()
   (mwim-test-with-sample "# heading1\n## heading2"
@@ -84,20 +57,31 @@ end
                          (should (= (point) 15))))
 
 (ert-deftest test/markdown-beginning-of-line/code ()
-  (mwim-test-with-sample markdown-test-code-sample
-    (next-line 2)
-    (markdown-beginning-of-line)
-    (should (= (point) 22))
-    (markdown-beginning-of-line)
-    (should (= (point) 20))
-    (markdown-beginning-of-line)
-    (should (= (point) 22))
-    ))
+  (mwim-test-with-sample
+   "\
+```
+def hello
+  puts 'hello world'
+end
+```"
+   (next-line 2)
+   (markdown-beginning-of-line)
+   (should (= (point) 17))
+   (markdown-beginning-of-line)
+   (should (= (point) 15))
+   (markdown-beginning-of-line)
+   (should (= (point) 17))))
 
 (ert-deftest test/markdown-beginning-of-line/code/prefix ()
-  (mwim-test-with-sample markdown-test-code-sample
-    (markdown-beginning-of-line 4)
-    (should (= (point) 36))))
+  (mwim-test-with-sample
+   "\
+```
+def hello
+  puts 'hello world'
+end
+```"
+   (markdown-beginning-of-line 3)
+   (should (= (point) 17))))
 
 (ert-deftest test/markdown-insert-space-context/blank-line ()
   (mwim-test-with-sample
@@ -192,13 +176,13 @@ end
 
 (ert-deftest test/markdown-evil-markdown-insert-line/list ()
   (mwim-test-with-sample
-   markdown-test-list-sample
+   "* List1"
    (evil-markdown-insert-line 1)
    (should (= (point) 3))))
 
 (ert-deftest test/markdown-evil-markdown-insert-line/heading ()
   (mwim-test-with-sample
-   markdown-test-heading-sample
+   "# Heading1"
    (evil-markdown-insert-line 1)
    (should (= (point) 3))))
 
