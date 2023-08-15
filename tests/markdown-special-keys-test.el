@@ -4,6 +4,7 @@
 
 ;; markdown-beginning-of-line の内部処理では、テキストプロパティを使った判定を行なっている箇所があるため insert 後に markdown-mode を有効にしている。
 ;; 逆順にすると、正しくテストができないため注意
+;; TODO use markdown-test-string instead
 (defmacro markdown-test-buffer (sample &rest body)
   (declare (debug t) (indent 1))
   `(with-temp-buffer
@@ -50,9 +51,10 @@
    (should (= (point) 15))))
 
 (ert-deftest test/markdown-beginning-of-line/heading/prefix ()
-  (markdown-test-buffer "# heading1\n## heading2"
-                         (markdown-beginning-of-line 2)
-                         (should (= (point) 15))))
+  (markdown-test-buffer
+   "# heading1\n## heading2"
+   (markdown-beginning-of-line 2)
+   (should (= (point) 15))))
 
 (ert-deftest test/markdown-beginning-of-line/code ()
   (markdown-test-buffer
@@ -83,25 +85,26 @@ end
 
 (ert-deftest test/markdown-insert-space-context/blank-line ()
   (markdown-test-buffer
-      ""
+   ""
    (markdown-insert-space-context)
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* "))))
 
 (ert-deftest test/markdown-insert-space-context/text ()
   (markdown-test-buffer
-      "List1"
-    (markdown-insert-space-context)
-    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
+   "List1"
+   (markdown-insert-space-context)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* List1"))))
 
 (ert-deftest test/markdown-insert-space-context/list-level1 ()
   (markdown-test-buffer
-      "* List1"
-    (forward-char 2)
-    (markdown-insert-space-context)
-    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "    * List1"))))
+   "* List1"
+   (forward-char 2)
+   (markdown-insert-space-context)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "    * List1"))))
 
 (ert-deftest test/markdown-insert-space-context/list-level1-2 ()
-  (markdown-test-buffer "\
+  (markdown-test-buffer
+   "\
 * List1
     * List1-2"
    (forward-char 2)
@@ -110,24 +113,25 @@ end
 
 (ert-deftest test/markdown-insert-space-context/list-level1-body ()
   (markdown-test-buffer
-      "* List1"
-    (forward-char 3)
-    (markdown-insert-space-context)
-    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* L ist1"))))
+   "* List1"
+   (forward-char 3)
+   (markdown-insert-space-context)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* L ist1"))))
 
 (ert-deftest test/markdown-insert-space-context/code-block ()
-  (markdown-test-buffer "```\n\n```"
-    (next-line)
-    (markdown-insert-space-context)
-    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "```\n \n```"))))
+  (markdown-test-buffer
+   "```\n\n```"
+   (next-line)
+   (markdown-insert-space-context)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "```\n \n```"))))
 
 
 (ert-deftest test/markdown-backspace-context/list-level1 ()
   (markdown-test-buffer
-      "* List1"
-    (forward-char 2)
-    (markdown-backspace-context)
-    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "List1"))))
+   "* List1"
+   (forward-char 2)
+   (markdown-backspace-context)
+   (should (equal (buffer-substring-no-properties (point-min) (point-max)) "List1"))))
 
 (ert-deftest test/markdown-backspace-context/list-level1-body ()
   (markdown-test-buffer
@@ -186,16 +190,19 @@ end
    (should (= (point) 3))))
 
 (ert-deftest test/markdown-markdown-cycle-advice/plain-text ()
-  (markdown-test-buffer ""
+  (markdown-test-buffer
+   ""
    (ert-simulate-command '(markdown-cycle))
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* ")))
 
-  (markdown-test-buffer "body"
+  (markdown-test-buffer
+   "body"
    (ert-simulate-command '(markdown-cycle))
 
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "* body")))
 
-  (markdown-test-buffer "body"
+  (markdown-test-buffer
+   "body"
    (let ((indent-tabs-mode nil))
      (forward-char 1)
      ;; markdownで呼び出されるmarkdown-indent-lineがthis-commandに依存しているため
@@ -204,17 +211,20 @@ end
      (should (equal (buffer-substring-no-properties (point-min) (point-max)) "    body")))))
 
 (ert-deftest test/markdown-markdown-cycle-advice/heading ()
-  (markdown-test-buffer "## Heading"
+  (markdown-test-buffer
+   "## Heading"
    (ert-simulate-command '(markdown-cycle))
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "## Heading"))))
 
 (ert-deftest test/markdown-markdown-cycle-advice/list ()
-  (markdown-test-buffer "* List"
+  (markdown-test-buffer
+   "* List"
    (ert-simulate-command '(markdown-cycle))
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "  * List"))))
 
 (ert-deftest test/markdown-markdown-cycle-advice/table ()
-  (markdown-test-buffer "| aaa | bbb |"
+  (markdown-test-buffer
+   "| aaa | bbb |"
    (ert-simulate-command '(markdown-cycle))
    (should (= (point) 3))
    (ert-simulate-command '(markdown-cycle))
