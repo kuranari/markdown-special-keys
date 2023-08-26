@@ -102,55 +102,55 @@ end
    (should (string= (buffer-string) "```\n \n```"))))
 
 
-(ert-deftest test/markdown-backspace-context/list-level1 ()
+(ert-deftest test/markdown-outdent-or-delete-advice/list-level1 ()
   (markdown-test-buffer
    "* List1"
    (forward-char 2)
-   (markdown-backspace-context)
+   (call-interactively #'markdown-outdent-or-delete)
    (should (string= (buffer-string) "List1"))))
 
-(ert-deftest test/markdown-backspace-context/list-level1-body ()
+(ert-deftest test/markdown-outdent-or-delete-advice/list-level1-body ()
   (markdown-test-buffer
    "* List1"
    (forward-char 3)
-   (markdown-backspace-context)
+   (call-interactively #'markdown-outdent-or-delete)
    (should (string= (buffer-string) "* ist1"))))
 
-(ert-deftest test/markdown-backspace-context/list-level1-body-whitespace ()
+(ert-deftest test/markdown-outdent-or-delete-advice/list-level1-body-whitespace ()
   (markdown-test-buffer
    "*  List1"
    (forward-char 3)
-   (markdown-backspace-context)
+   (call-interactively #'markdown-outdent-or-delete)
    (should (string= (buffer-string) "* List1"))))
 
-(ert-deftest test/markdown-backspace-context/list-level2-head-of-bullet ()
+(ert-deftest test/markdown-outdent-or-delete-advice/list-level2-head-of-bullet ()
   (markdown-test-buffer
    "    * List1"
    (forward-char 4)
-   (markdown-backspace-context)
+   (call-interactively #'markdown-outdent-or-delete)
    (should (string= (buffer-string) "* List1"))))
 
-(ert-deftest test/markdown-backspace-context/list-level2-head-of-list ()
+(ert-deftest test/markdown-outdent-or-delete-advice/list-level2-head-of-list ()
   (markdown-test-buffer
    "    * List1"
    (forward-char 6)
-   (markdown-backspace-context)
+   (call-interactively #'markdown-outdent-or-delete)
    (should (string= (buffer-string) "* List1"))))
 
-(ert-deftest test/markdown-backspace-context/list-level2-3-head-of-list ()
+(ert-deftest test/markdown-outdent-or-delete-advice/list-level2-3-head-of-list ()
   (markdown-test-buffer
    "\
     * List1
         * List1-2"
    (forward-char 6)
-   (markdown-backspace-context)
+   (call-interactively #'markdown-outdent-or-delete)
    (should (string= (buffer-string) "* List1\n        * List1-2"))))
 
-(ert-deftest test/markdown-backspace-context/full-width-space ()
+(ert-deftest test/markdown-outdent-or-delete-advice/full-width-space ()
   (markdown-test-buffer
    "　"
    (forward-char 1)
-   (markdown-backspace-context)
+   (call-interactively #'markdown-outdent-or-delete)
    (should (string= (buffer-string) ""))))
 
 (ert-deftest test/markdown-evil-markdown-insert-line/list ()

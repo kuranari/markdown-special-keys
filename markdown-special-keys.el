@@ -98,24 +98,23 @@ With argument N not nil or 1, move forward N - 1 lines first."
        ;; 3. それ以外ならスペースを入力する
        (t (insert " "))))))
 
-(defun markdown-backspace-context ()
-  "カーソルがリストの先頭にある場合にアウトデントする"
-  (interactive)
-  (let ((start-of-indention (markdown--current-indentation)))
-    (cond
-     ;; 1. リストの先頭の場合
-     ((looking-back markdown-regex-list-ascii-only)
+(defun markdown-outdent-or-delete-advice (original &rest args)
+  (cond
+   ;; 1. リストの先頭の場合
+   ((looking-back markdown-regex-list-ascii-only)
+    (let ((start-of-indention (markdown--current-indentation)))
       (if (= start-of-indention 0)
           ;; 1-1. バレットを削除
           (kill-line 0)
         ;; 1-2. アウトデント
         (save-excursion
-          (indent-line-to (- start-of-indention markdown-list-indent-width)))))
-     ;; 2. 全角スペースの場合は文字する
-     ;; (行頭の全角スペースを削除できるようにするため)
-     ((string= (char-to-string (preceding-char)) "　") (delete-char -1))
-     ;; 3. それ以外ならデフォルトの挙動を行う
-     (t (markdown-outdent-or-delete 1)))))
+          (indent-line-to (- start-of-indention markdown-list-indent-width))))))
+   ;; 2. 全角スペースの場合は文字する
+   ;; (行頭の全角スペースを削除できるようにするため)
+   ((string= (char-to-string (preceding-char)) "　") (delete-char -1))
+   (t (apply original args))))
+
+(advice-add 'markdown-outdent-or-delete :around #'markdown-outdent-or-delete-advice)
 
 ;; 参考: evil-org-insert-line
 (defun evil-markdown-insert-line (count)
@@ -169,9 +168,7 @@ The insertion will be repeated COUNT times."
 
 (evil-define-key 'hybrid markdown-mode-map
   (kbd "SPC") 'markdown-insert-space-context
-  (kbd "DEL") 'markdown-backspace-context
-  (kbd "C-a") 'markdown-beginning-of-line
-  (kbd "C-h") 'markdown-backspace-context)
+  (kbd "C-a") 'markdown-beginning-of-line)
 
 (evil-define-key 'normal markdown-mode-map
   (kbd "I") 'evil-markdown-insert-line)
