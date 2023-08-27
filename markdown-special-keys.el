@@ -109,7 +109,17 @@ With argument N not nil or 1, move forward N - 1 lines first."
         ;; 1-2. アウトデント
         (save-excursion
           (indent-line-to (- start-of-indention markdown-list-indent-width))))))
-   ;; 2. 全角スペースの場合は文字する
+   ;; 2. 見出しの先頭の場合
+   ((and
+     markdown-hide-markup
+     (save-excursion
+       (beginning-of-line)
+       (looking-at markdown-regex-header-atx))
+     (= (match-beginning 2) (point)))
+    (save-excursion
+      (unless (string-empty-p (match-string 2)) (beginning-of-line))
+      (delete-char -1)))
+   ;; 3. 全角スペースの場合は削除する
    ;; (行頭の全角スペースを削除できるようにするため)
    ((string= (char-to-string (preceding-char)) "　") (delete-char -1))
    (t (apply original args))))
