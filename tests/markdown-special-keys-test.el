@@ -101,6 +101,22 @@ end
    (markdown-insert-space-context)
    (should (string= (buffer-string) "```\n \n```"))))
 
+(ert-deftest test/markdown-outdent-or-delete-advice/heading ()
+  (let ((markdown-hide-markup t))
+    (markdown-test-buffer
+     "\n## Heading"
+     (next-line)
+     (forward-char 3)
+     (call-interactively #'markdown-outdent-or-delete)
+     (should (string= (buffer-string) "## Heading"))))
+
+  (let ((markdown-hide-markup nil))
+    (markdown-test-buffer
+     "\n## Heading"
+     (next-line)
+     (forward-char 3)
+     (call-interactively #'markdown-outdent-or-delete)
+     (should (string= (buffer-string) "\n##Heading")))))
 
 (ert-deftest test/markdown-outdent-or-delete-advice/list-level1 ()
   (markdown-test-buffer
