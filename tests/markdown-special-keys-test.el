@@ -162,6 +162,13 @@ end
    (call-interactively #'markdown-outdent-or-delete)
    (should (string= (buffer-string) "* List1\n        * List1-2"))))
 
+(ert-deftest test/markdown-outdent-or-delete-advice/checkbox ()
+  (markdown-test-buffer
+   "* [X] List1"
+   (forward-char 6)
+   (call-interactively #'markdown-outdent-or-delete)
+   (should (string= (buffer-string) "* List1"))))
+
 (ert-deftest test/markdown-outdent-or-delete-advice/full-width-space ()
   (markdown-test-buffer
    "　"

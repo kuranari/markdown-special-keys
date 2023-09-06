@@ -103,12 +103,15 @@ With argument N not nil or 1, move forward N - 1 lines first."
    ;; 1. リストの先頭の場合
    ((looking-back markdown-regex-list-ascii-only)
     (let ((start-of-indention (markdown--current-indentation)))
-      (if (= start-of-indention 0)
-          ;; 1-1. バレットを削除
-          (kill-line 0)
-        ;; 1-2. アウトデント
+      (cond
+       ;; 1-1. checkboxを削除
+       ((match-string 4) (delete-char (- (match-beginning 4) (point))))
+       ;; 1-2. Level1のバレットを削除
+       ((= start-of-indention 0) (kill-line 0))
+       ;; 1-3. アウトデント
+       (t
         (save-excursion
-          (indent-line-to (- start-of-indention markdown-list-indent-width))))))
+          (indent-line-to (- start-of-indention markdown-list-indent-width)))))))
    ;; 2. 見出しの先頭の場合
    ((and
      markdown-hide-markup
