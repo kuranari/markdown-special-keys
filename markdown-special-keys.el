@@ -41,8 +41,7 @@ With argument N not nil or 1, move forward N - 1 lines first."
       ;; At a header, special position is before the title.
       (let ((refpos (match-beginning 2)))
 	      (if (or (> origin refpos)
-                (= origin (line-beginning-position))
-                (/= (line-number-at-pos origin) (line-number-at-pos))
+                (<= origin (line-beginning-position))
                 ;; Prevents the cursor from moving to invisible characters
                 markdown-hide-markup)
 	          (goto-char refpos))))
@@ -50,15 +49,13 @@ With argument N not nil or 1, move forward N - 1 lines first."
       ;; At a list item, special position is after the list marker or checkbox.
       (let ((refpos (or (match-end 4) (match-end 3))))
 	      (if (or (> origin refpos)
-                (= origin (line-beginning-position))
-                (/= (line-number-at-pos origin) (line-number-at-pos)))
+                (<= origin (line-beginning-position)))
 	          (goto-char refpos))))
      ((looking-at "^\s+")
       ;; At an indented text line, special position is after the indentation.
       (let ((refpos (match-end 0)))
 	      (if (or (> origin refpos)
-                (= origin (line-beginning-position))
-                (/= (line-number-at-pos origin) (line-number-at-pos)))
+                (<= origin (line-beginning-position)))
             (goto-char refpos))))
 
      ;; No special case, already at beginning of line.
