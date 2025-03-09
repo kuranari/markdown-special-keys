@@ -40,21 +40,21 @@ With argument N not nil or 1, move forward N - 1 lines first."
      ((looking-at markdown-regex-header-atx)
       ;; At a header, special position is before the title.
       (let ((refpos (match-beginning 2)))
-	      (if (or (> origin refpos)
+        (if (or (> origin refpos)
                 (<= origin (line-beginning-position))
                 ;; Prevents the cursor from moving to invisible characters
                 markdown-hide-markup)
-	          (goto-char refpos))))
+            (goto-char refpos))))
      ((looking-at markdown-regex-list)
       ;; At a list item, special position is after the list marker or checkbox.
       (let ((refpos (or (match-end 4) (match-end 3))))
-	      (if (or (> origin refpos)
+        (if (or (> origin refpos)
                 (<= origin (line-beginning-position)))
-	          (goto-char refpos))))
+            (goto-char refpos))))
      ((looking-at "^\s+")
       ;; At an indented text line, special position is after the indentation.
       (let ((refpos (match-end 0)))
-	      (if (or (> origin refpos)
+        (if (or (> origin refpos)
                 (<= origin (line-beginning-position)))
             (goto-char refpos))))
 
@@ -153,11 +153,11 @@ The insertion will be repeated COUNT times."
    ;; Listと本文の間に空行がない場合に、本文の次の行がリストになることを防ぐため
    ;; markdown-indent-on-enterが'indent-and-new-itemであってもList ItemのLazy continuation lineでは新規リストを追加しない
    ((and
-    (memq markdown-indent-on-enter '(indent-and-new-item))
-    (markdown-list-item-at-point-p)
-    (save-excursion
-      (beginning-of-line)
-      (not (looking-at-p markdown-regex-list))))
+     (memq markdown-indent-on-enter '(indent-and-new-item))
+     (markdown-list-item-at-point-p)
+     (save-excursion
+       (beginning-of-line)
+       (not (looking-at-p markdown-regex-list))))
     (newline)
     (markdown-indent-line))
    ;; markdown-hide-markupが有効で見出し本文の先頭の場合
@@ -176,9 +176,8 @@ The insertion will be repeated COUNT times."
 
 (advice-add 'markdown-enter-key :around #'markdown-enter-key-advice)
 
-(evil-define-key 'hybrid markdown-mode-map
-  (kbd "SPC") 'markdown-insert-space-context
-  (kbd "C-a") 'markdown-beginning-of-line)
+(define-key markdown-mode-map (kbd "SPC") 'markdown-insert-space-context)
+(define-key markdown-mode-map (kbd "C-a") 'markdown-beginning-of-line)
 
 (evil-define-key 'normal markdown-mode-map
   (kbd "I") 'evil-markdown-insert-line)
